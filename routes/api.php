@@ -20,4 +20,6 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::get('/food-logs', [FoodLogController::class, 'index']);
     Route::post('/food-logs', [FoodLogController::class, 'store']);
+
+    Route::post('/logout', [AuthController::class, 'logout']);
 });
