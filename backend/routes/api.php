@@ -18,8 +18,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/products', [ProductController::class, 'index']);
     Route::post('/products', [ProductController::class, 'store']);
 
-    Route::get('/food-logs', [FoodLogController::class, 'index']);
-    Route::post('/food-logs', [FoodLogController::class, 'store']);
+    Route::get('/food-logs/totals', [FoodLogController::class, 'getTotals']);
+    Route::apiResource('/food-logs', FoodLogController::class);
 
     Route::post('/logout', [AuthController::class, 'logout']);
 });

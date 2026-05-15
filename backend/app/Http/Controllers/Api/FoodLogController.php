@@ -13,20 +13,22 @@ class FoodLogController extends Controller
 {
     //
 
-    public function index(Request $request) {
+    public function index(Request $request)
+    {
         return $request->user()->foodLogs()
-        ->whereDate('consumed_at', now()->format('Y-m-d'))
-        ->with('product')
-        ->get();
+            ->whereDate('consumed_at', now()->format('Y-m-d'))
+            ->with('product')
+            ->get();
     }
 
-    public function store(Request $request) {
-        
-    $request->validate([
-        'product_id' => 'required|exists:products,id',
-        'grams' => 'required|numeric|min:1',
-        'meal_type' => 'required|string',
-    ]);
+    public function store(Request $request)
+    {
+
+        $request->validate([
+            'product_id' => 'required|exists:products,id',
+            'grams' => 'required|numeric|min:1',
+            'meal_type' => 'required|string',
+        ]);
 
         $product = Product::findOrFail($request->product_id);
         $grams = $request->grams;
@@ -45,4 +47,31 @@ class FoodLogController extends Controller
         ]);
     }
 
+    public function getTotals(Request $request)
+    {
+        $logs = $request->user()->foodLogs()
+            ->whereDate('consumed_at', now()->format('Y-m-d'))
+            ->with('product')
+            ->get();
+
+        $kcal = 0;
+        $p = 0;
+        $f = 0;
+        $c = 0;
+
+        foreach ($logs as $log) {
+            $ratio = $log->grams / 100;
+            $kcal += ($log->product->kcal * $ratio);
+            $p += ($log->product->protein * $ratio);
+            $f += ($log->product->fat * $ratio);
+            $c += ($log->product->carbs * $ratio);
+        }
+
+        return response()->json([
+            'kcal' => round($kcal),
+            'protein' => round($p, 1),
+            'fat' => round($f, 1),
+            'carbs' => round($c, 1)
+        ]);
+    }
 }
