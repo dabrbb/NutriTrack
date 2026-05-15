@@ -1,0 +1,23 @@
+### Login Request
+POST http://127.0.0.1:8000/api/login
+Content-Type: application/json
+Accept: application/json
+
+{
+    "email": "artem@test.com",
+    "password": "password123"
+}
+
+### Add Product
+POST http://127.0.0.1:8000/api/products
+Content-Type: application/json
+Accept: application/json
+Authorization: Bearer 2|8MuVEs3zEARZXDYLJfu9R83kOyDoa45CuqO710MSf1238be9
+
+{
+    "name": "Pechuga de Pollo",
+    "kcal": 165,
+    "protein": 35,
+    "fat": 3.6,
+    "carbs": 0
+}
