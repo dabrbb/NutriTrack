@@ -19,7 +19,7 @@ class ProductController extends Controller
             'carbs' => 'required|numeric',
         ]);
 
-        // Create user in db
+        // Create product in db
         $product = Product::create([
             'user_id' => $request->user()->id,
             'name' => $request->name,

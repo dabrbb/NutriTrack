@@ -74,4 +74,12 @@ class FoodLogController extends Controller
             'carbs' => round($c, 1)
         ]);
     }
+
+    public function destroy(Request $request, $id)
+    {
+        $log = $request->user()->foodLogs()->findOrFail($id);
+        $log->delete();
+
+        return response()->json(['message' => 'Log deleted successfully'], 200);
+    }
 }

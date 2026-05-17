@@ -5,6 +5,9 @@ import Input from '../components/Input';
 import Select from '../components/Select';
 import Button from '../components/Button';
 import NutrientRow from '../components/NutrientRow';
+import TodayMeals from '../components/TodayMeals';
+import MealResultCard from '../components/MealResultCard';
+import DailyTotalCard from '../components/DailyTotalCard';
 import api from '../api';
 
 export default function Dashboard() {
@@ -17,6 +20,18 @@ export default function Dashboard() {
     const [result, setResult] = useState({ kcal: 0, protein: 0, fat: 0, carbs: 0 });
     const [total, setTotal] = useState({ kcal: 0, protein: 0, fat: 0, carbs: 0 });
 
+    const [mealType, setMealType] = useState("desayuno");
+    const [logs, setLogs] = useState([]);
+
+    const loadTodayLogs = async () => {
+        try {
+            const res = await api.get('/food-logs');
+            setLogs(res.data);
+        } catch (e) {
+            console.error("Error al cargar registros:", e);
+        }
+    };
+
     useEffect(() => {
         const loadInitialData = async () => {
             try {
@@ -25,6 +40,8 @@ export default function Dashboard() {
 
                 const totalRes = await api.get('/food-logs/totals');
                 setTotal(totalRes.data);
+
+                await loadTodayLogs();
             } catch (e) {
                 console.error(e);
             } finally {
@@ -41,11 +58,12 @@ export default function Dashboard() {
             await api.post('/food-logs', {
                 product_id: selectedProduct,
                 grams: grams,
-                meal_type: 'almuerzo'
+                meal_type: mealType
             });
 
             const totalsRes = await api.get('/food-logs/totals');
             setTotal(totalsRes.data);
+            await loadTodayLogs();
 
             const productData = products.find(p => p.id === parseInt(selectedProduct));
             const ratio = parseFloat(grams) / 100;
@@ -61,6 +79,19 @@ export default function Dashboard() {
             console.error("Error saving log:", error);
         }
     };
+
+    const handleDelete = async (id) => {
+        try {
+            await api.delete(`/food-logs/${id}`);
+
+            const totalsRes = await api.get('/food-logs/totals');
+            setTotal(totalsRes.data);
+
+            await loadTodayLogs();
+        } catch (error) {
+            console.error("Error al eliminar el registro:", error);
+        }
+    }
 
     return (
         <Layout>
@@ -89,6 +120,18 @@ export default function Dashboard() {
                             value={grams}
                             onChange={(e) => setGrams(e.target.value)}
                         />
+                        <Select
+                            label="Momento del día"
+                            options={[
+                                { label: "Desayuno", value: "desayuno" },
+                                { label: "Almuerzo", value: "almuerzo" },
+                                { label: "Merienda", value: "merienda" },
+                                { label: "Cena", value: "cena" },
+                                { label: "Snack", value: "snack" }
+                            ]}
+                            value={mealType}
+                            onChange={(e) => setMealType(e.target.value)}
+                        />
                         <Button
                             className="mt-6 py-4"
                             onClick={handleCalculate}
@@ -102,31 +145,12 @@ export default function Dashboard() {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
 
                     {/* Whitre card */}
-                    <Card className="bg-white p-7">
-                        <h3 className="text-lg font-bold text-[#1A1C1E] mb-6">
-                            Resultado de esta comida
-                        </h3>
-                        <div className="space-y-4">
-                            <NutrientRow label="Kcal" value={result.kcal} icon="🔥" bg="bg-orange-50" />
-                            <NutrientRow label="Proteínas" value={result.protein} unit="g" icon="🥩" bg="bg-red-50" />
-                            <NutrientRow label="Grasas" value={result.fat} unit="g" icon="💧" bg="bg-yellow-50" />
-                            <NutrientRow label="Carbohidratos" value={result.carbs} unit="g" icon="🍞" bg="bg-blue-50" />
-                        </div>
-                    </Card>
+                    <MealResultCard result={result} />
 
                     {/* Green card (Total Diario) */}
-                    <Card className="p-7 bg-[#DCFCE7] border-none">
-                        <h3 className="text-lg font-bold text-[#1A1C1E] mb-6">
-                            Total Diario
-                        </h3>
-                        <div className="space-y-4">
-                            <NutrientRow label="Kcal" value={total?.kcal || 0} icon="🔥" bg="bg-orange-50" />
-                            <NutrientRow label="Proteínas" value={total?.protein || 0} unit="g" icon="🥩" bg="bg-red-50" />
-                            <NutrientRow label="Grasas" value={total?.fat || 0} unit="g" icon="💧" bg="bg-yellow-50" />
-                            <NutrientRow label="Carbohidratos" value={total?.carbs || 0} unit="g" icon="🍞" bg="bg-blue-50" />
-                        </div>
-                    </Card>
+                    <DailyTotalCard total={total} />
                 </div>
+                <TodayMeals logs={logs} onDelete={handleDelete} />
             </div>
         </Layout>
     );
