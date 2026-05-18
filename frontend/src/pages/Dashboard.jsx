@@ -1,13 +1,13 @@
 import { useEffect, useState } from 'react';
-import Layout from '../components/Layout';
-import Card from '../components/Card';
-import Input from '../components/Input';
-import Select from '../components/Select';
-import Button from '../components/Button';
-import NutrientRow from '../components/NutrientRow';
-import TodayMeals from '../components/TodayMeals';
-import MealResultCard from '../components/MealResultCard';
-import DailyTotalCard from '../components/DailyTotalCard';
+import Layout from '../components/layout/Layout';
+import Card from '../components/forms/Card';
+import Input from '../components/ui/Input';
+import Select from '../components/ui/Select';
+import Button from '../components/ui/Button';
+import NutrientRow from '../components/ui/NutrientRow';
+import TodayMeals from '../components/calculator/TodayMeals';
+import MealResultCard from '../components/calculator/MealResultCard';
+import DailyTotalCard from '../components/calculator/DailyTotalCard';
 import api from '../api';
 
 export default function Dashboard() {
@@ -50,6 +50,11 @@ export default function Dashboard() {
         };
         loadInitialData();
     }, []);
+
+    if (parseFloat(grams) < 0) {
+        alert("Los valores nutricionales no pueden ser negativos.");
+        return;
+    }
 
     const handleCalculate = async () => {
         if (!selectedProduct || !grams) return;
@@ -116,6 +121,7 @@ export default function Dashboard() {
                         <Input
                             label="Gramos (g)"
                             type="number"
+                            min="0"
                             placeholder="Introduzca la cantidad en gramos"
                             value={grams}
                             onChange={(e) => setGrams(e.target.value)}
@@ -133,7 +139,7 @@ export default function Dashboard() {
                             onChange={(e) => setMealType(e.target.value)}
                         />
                         <Button
-                            className="mt-6 py-4"
+                            className="w-full mt-6 py-4"
                             onClick={handleCalculate}
                         >
                             Calcular

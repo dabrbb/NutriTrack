@@ -1,6 +1,6 @@
 import { useNavigate, Link, useLocation } from 'react-router-dom';
-import Button from './Button';
-import api from '../api';
+import Button from '../ui/Button';
+import api from '../../api';
 
 export default function Layout({ children }) {
     const navigate = useNavigate();

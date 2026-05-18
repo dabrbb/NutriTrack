@@ -1,5 +1,5 @@
-import Card from './Card';
-import NutrientRow from './NutrientRow';
+import Card from '../forms/Card';
+import NutrientRow from '../ui/NutrientRow';
 
 export default function MealResultCard({ result }) {
     return (

@@ -1,9 +1,9 @@
 import { useNavigate } from 'react-router-dom';
 import api from '../api';
 import { useState } from 'react';
-import Input from '../components/Input';
-import Button from '../components/Button';
-import AuthCard from '../components/AuthCard';
+import Input from '../components/ui/Input';
+import Button from '../components/ui/Button';
+import AuthCard from '../components/auth/AuthCard';
 
 export default function Login() {
     const [email, setEmail] = useState("");

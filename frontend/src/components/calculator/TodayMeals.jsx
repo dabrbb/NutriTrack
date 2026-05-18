@@ -1,4 +1,4 @@
-import Card from './Card';
+import Card from '../forms/Card';
 
 export default function TodayMeals({ logs, onDelete }) {
     return (
@@ -33,7 +33,7 @@ export default function TodayMeals({ logs, onDelete }) {
                                     </span>
                                     <button
                                         onClick={() => onDelete(log.id)}
-                                        className="text-red-500 hover:text-red-700 text-xs font-medium p-1 transition-colors"
+                                        className="text-red-500 hover:text-red-700 text-xs font-medium p-1 transition-colors cursor-pointer"
                                     >
                                         ✕
                                     </button>

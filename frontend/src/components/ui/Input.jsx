@@ -1,4 +1,4 @@
-export default function Input({ label, type, placeholder, onChange, value }) {
+export default function Input({ label, type, placeholder, onChange, value, min }) {
     return (
         <div className="flex flex-col space-y-2 w-full">
             <label className="text-sm font-bold text-[#49454F] ml-1">
@@ -6,6 +6,7 @@ export default function Input({ label, type, placeholder, onChange, value }) {
             </label>
             <input
                 value={value}
+                min={min}
                 onChange={onChange}
                 type={type}
                 placeholder={placeholder}

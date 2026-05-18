@@ -5,11 +5,18 @@ export default function Button({
     className = "",
     circle = false
 }) {
-    const baseStyles = "transition-all active:scale-[0.95] cursor-pointer flex items-center justify-center";
+    const baseStyles = "transition-all active:scale-[0.95] cursor-pointer flex items-center justify-center font-bold";
+
+    const hasWidth = className.includes('w-') || className.includes('p-') || className.includes('px-') || className.includes('py-');
+    const hasMargin = className.includes('mt-') || className.includes('m-');
+    const hasShadow = className.includes('shadow-');
 
     const shapeStyles = circle
         ? "rounded-full p-2"
-        : "py-4 rounded-2xl w-full font-bold text-lg mt-8 shadow-lg";
+        : `${hasWidth ? '' : 'w-full py-4 px-6'} 
+           ${hasMargin ? '' : 'mt-8'} 
+           ${hasShadow ? '' : 'shadow-lg'} 
+           rounded-2xl text-lg`;
 
     const variants = {
         primary: "bg-[#00C950] hover:bg-[#00b347] text-white shadow-[#00C950]/30",
