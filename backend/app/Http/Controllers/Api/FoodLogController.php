@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Models\FoodLog;
 use App\Models\Product;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Carbon\Carbon;
 
 use function Symfony\Component\Clock\now;
 
@@ -81,5 +83,37 @@ class FoodLogController extends Controller
         $log->delete();
 
         return response()->json(['message' => 'Log deleted successfully'], 200);
+    }
+
+    public function history(Request $request)
+    {
+        $userId = $request->user()->id;
+
+        $history = DB::table('food_logs')
+            ->join('products', 'food_logs.product_id', '=', 'products.id')
+            ->select(
+                DB::raw('DATE(food_logs.created_at) as date'),
+                DB::raw('SUM(products.kcal * (food_logs.grams / 100)) as total_kcal'),
+                DB::raw('SUM(products.protein * (food_logs.grams / 100)) as total_protein'),
+                DB::raw('SUM(products.fat * (food_logs.grams / 100)) as total_fat'),
+                DB::raw('SUM(products.carbs * (food_logs.grams / 100)) as total_carbs')
+            )
+            ->where('food_logs.user_id', $userId)
+            ->groupBy(DB::raw('DATE(food_logs.created_at)'))
+            ->orderBy('date', 'desc')
+            ->take(30)
+            ->get();
+
+        $formattedHistory = $history->map(function ($day) {
+            return [
+                'date' => Carbon::parse($day->date)->format('d/m/Y'),
+                'kcal' => round($day->total_kcal),
+                'protein' => round($day->total_protein, 1),
+                'fat' => round($day->total_fat, 1),
+                'carbs' => round($day->total_carbs, 1),
+            ];
+        });
+
+        return response()->json($formattedHistory);
     }
 }
