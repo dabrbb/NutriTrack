@@ -25,7 +25,10 @@ export default function Layout({ children }) {
                 <div className="max-w-7xl w-full mx-auto px-6 flex items-center">
 
                     <div className="flex items-center space-x-12">
-                        <div className="flex items-center space-x-3 cursor-pointer" onClick={() => navigate('/dashboard')}>
+                        <div
+                            className="flex items-center space-x-3 cursor-pointer"
+                            onClick={() => navigate('/dashboard')}
+                        >
                             <div className="bg-[#00C950] w-8 h-8 rounded-lg flex items-center justify-center shadow-md shadow-[#00C950]/20">
                                 <span className="text-white font-bold text-lg leading-none">N</span>
                             </div>
@@ -44,7 +47,10 @@ export default function Layout({ children }) {
 
                     {/* Profile & Logout Group */}
                     <div className="ml-auto flex items-center space-x-3">
-                        <div className="w-9 h-9 rounded-full bg-gray-50 flex items-center justify-center text-gray-400 border border-gray-100 shadow-sm">
+                        <div
+                            className="w-9 h-9 rounded-full bg-gray-50 flex items-center justify-center text-gray-400 border border-gray-100 shadow-sm cursor-pointer hover:bg-gray-100/70 transition-colors"
+                            onClick={() => navigate('/profile')}
+                        >
                             <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                                 <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
                             </svg>

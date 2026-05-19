@@ -3,6 +3,7 @@ import Login from './pages/Login';
 import Register from './pages/Register';
 import Dashboard from './pages/Dashboard';
 import Products from './pages/Products';
+import Profile from './pages/Profile';
 import ProtectedRoute from './components/auth/ProtectedRoute';
 
 function App() {
@@ -13,6 +14,7 @@ function App() {
         <Route path='/login' element={<Login />} />
         <Route path='/dashboard' element={<ProtectedRoute> <Dashboard /> </ProtectedRoute>} />
         <Route path='/products' element={<ProtectedRoute> <Products /> </ProtectedRoute>} />
+        <Route path='/profile' element={<ProtectedRoute> <Profile /> </ProtectedRoute>} />
         <Route path="/" element={<Navigate to="/dashboard" replace />} />
 
         <Route path="*" element={<Navigate to="/" replace />} />
