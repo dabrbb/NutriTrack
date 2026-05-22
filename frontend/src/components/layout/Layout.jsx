@@ -1,11 +1,13 @@
 import { useNavigate, Link, useLocation } from 'react-router-dom';
 import Button from '../ui/Button';
 import api from '../../api';
+import { useUser } from '../hooks/UserContext';
 
 export default function Layout({ children }) {
     const navigate = useNavigate();
     const location = useLocation();
     const isActive = (path) => location.pathname === path;
+    const { user } = useUser();
 
     const handleLogout = async () => {
         try {
@@ -17,6 +19,14 @@ export default function Layout({ children }) {
             localStorage.removeItem('token');
             navigate('/login');
         }
+    };
+
+    const getAvatarUrl = () => {
+        if (!user?.avatar_path) return null;
+        if (user.avatar_path.startsWith('http')) return user.avatar_path;
+
+        const rootUrl = api.defaults.baseURL.replace('/api', '');
+        return `${rootUrl}/storage/${user.avatar_path}`;
     };
 
     return (
@@ -51,9 +61,17 @@ export default function Layout({ children }) {
                             className="w-9 h-9 rounded-full bg-gray-50 flex items-center justify-center text-gray-400 border border-gray-100 shadow-sm cursor-pointer hover:bg-gray-100/70 transition-colors"
                             onClick={() => navigate('/profile')}
                         >
-                            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                                <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
-                            </svg>
+                            {user?.avatar_path ? (
+                                <img
+                                    src={getAvatarUrl()}
+                                    alt="Avatar"
+                                    className="w-full h-full object-cover rounded-full"
+                                />
+                            ) : (
+                                <svg className="w-full h-full text-gray-400" fill="currentColor" viewBox="0 0 24 24">
+                                    <path d="M24 20.993V24H0v-2.996A14.977 14.977 0 0112.004 15c4.904 0 9.26 2.354 11.996 5.993zM16.002 8.999a4 4 0 11-8 0 4 4 0 018 0z" />
+                                </svg>
+                            )}
                         </div>
 
                         <Button

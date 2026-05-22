@@ -25,6 +25,7 @@ class User extends Authenticatable
         'height',
         'weight',
         'birthday',
+        'avatar_path',
     ];
 
     /**

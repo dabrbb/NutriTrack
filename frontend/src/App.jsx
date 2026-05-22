@@ -5,20 +5,23 @@ import Dashboard from './pages/Dashboard';
 import Products from './pages/Products';
 import Profile from './pages/Profile';
 import ProtectedRoute from './components/auth/ProtectedRoute';
+import { UserProvider } from './components/hooks/UserContext';
 
 function App() {
   return (
     <BrowserRouter>
-      <Routes>
-        <Route path='/register' element={<Register />} />
-        <Route path='/login' element={<Login />} />
-        <Route path='/dashboard' element={<ProtectedRoute> <Dashboard /> </ProtectedRoute>} />
-        <Route path='/products' element={<ProtectedRoute> <Products /> </ProtectedRoute>} />
-        <Route path='/profile' element={<ProtectedRoute> <Profile /> </ProtectedRoute>} />
-        <Route path="/" element={<Navigate to="/dashboard" replace />} />
+      <UserProvider>
+        <Routes>
+          <Route path='/register' element={<Register />} />
+          <Route path='/login' element={<Login />} />
+          <Route path='/dashboard' element={<ProtectedRoute> <Dashboard /> </ProtectedRoute>} />
+          <Route path='/products' element={<ProtectedRoute> <Products /> </ProtectedRoute>} />
+          <Route path='/profile' element={<ProtectedRoute> <Profile /> </ProtectedRoute>} />
+          <Route path="/" element={<Navigate to="/dashboard" replace />} />
 
-        <Route path="*" element={<Navigate to="/" replace />} />
-      </Routes>
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
+      </UserProvider>
     </BrowserRouter>
   );
 }
