@@ -13,11 +13,11 @@ export default function Layout({ children }) {
         try {
             await api.post('/logout');
             localStorage.removeItem('token');
-            navigate('/login');
+            navigate('/');
         } catch (error) {
             console.error("Error logging out", error);
             localStorage.removeItem('token');
-            navigate('/login');
+            navigate('/');
         }
     };
 

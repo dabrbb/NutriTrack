@@ -1,14 +1,20 @@
 import { createContext, useContext, useState, useEffect } from 'react';
 import api from '../../api';
 
-const UserContext = createContext();
+const UserContext = createContext(null);
 
 export const UserProvider = ({ children }) => {
     const [user, setUser] = useState(null);
 
     const refreshUser = async () => {
-        const res = await api.get('/profile');
-        setUser(res.data.data);
+        if (!localStorage.getItem('token')) return;
+
+        try {
+            const res = await api.get('/profile');
+            setUser(res.data.data);
+        } catch (error) {
+             console.error("Error al tomar el perfil:", error);
+        }
     };
 
     useEffect(() => {
