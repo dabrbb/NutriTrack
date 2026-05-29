@@ -10,12 +10,14 @@ import { useUser } from '../components/hooks/UserContext';
 
 export default function Profile() {
     const navigate = useNavigate();
-    const {user, setUser} = useUser();
+    const { user, setUser } = useUser();
     const [history, setHistory] = useState([]);
     const [loading, setLoading] = useState(true);
     const [isModalOpen, setIsModalOpen] = useState(false);
 
     const loadProfileData = async () => {
+        if (!localStorage.getItem('token')) return;
+
         try {
             const userRes = await api.get('/profile');
             setUser(userRes.data.data);
@@ -23,14 +25,18 @@ export default function Profile() {
             const historyRes = await api.get('/food-logs/history-with-meals');
             setHistory(historyRes.data);
         } catch (e) {
-            console.error("Error al cargar datos:", e);
+            if (e.response?.status !== 401) {
+                console.error("Error al cargar datos:", e);
+            }
         } finally {
             setLoading(false);
         }
     };
 
     useEffect(() => {
-        loadProfileData();
+        if (localStorage.getItem('token')) {
+            loadProfileData();
+        }
     }, []);
 
     const handleSaveProfile = async (data) => {
@@ -54,6 +60,7 @@ export default function Profile() {
             console.error(e);
         } finally {
             localStorage.removeItem('token');
+            setUser(null);
             navigate('/login');
         }
     };

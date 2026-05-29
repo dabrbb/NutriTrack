@@ -13,7 +13,9 @@ export const UserProvider = ({ children }) => {
             const res = await api.get('/profile');
             setUser(res.data.data);
         } catch (error) {
-             console.error("Error al tomar el perfil:", error);
+            if (error.response?.status !== 401) {
+                console.error("Error al cargar usuario:", error);
+            }
         }
     };
 

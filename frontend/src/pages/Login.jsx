@@ -8,9 +8,12 @@ import AuthCard from '../components/auth/AuthCard';
 export default function Login() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
+    const [error, setError] = useState(null);
     const navigate = useNavigate();
 
     const handleLogin = async () => {
+        setError(null);
+
         try {
             const response = await api.post('/login', { email, password });
             if (response.data.token) {
@@ -18,24 +21,31 @@ export default function Login() {
                 navigate('/dashboard');
             }
         } catch (error) {
-            alert("Error: " + (error.response?.data?.message || "No se ha podido entrar"));
+            const message = error.response?.data?.message || "Credenciales no válidas";
+            setError(message);
         }
     };
 
     return (
-        <AuthCard 
-            title="Iniciar sesión" 
+        <AuthCard
+            title="Iniciar sesión"
             subtitle="¡Bienvenido de nuevo!"
         >
             <div className="space-y-5">
-                <Input 
+                {error && (
+                    <div className="p-3 text-sm text-red-600 bg-red-50 border border-red-200 rounded-lg">
+                        {error}
+                    </div>
+                )}
+
+                <Input
                     label="Email"
                     type="email"
                     placeholder="Introduce tu email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                 />
-                <Input 
+                <Input
                     label="Contraseña"
                     type="password"
                     placeholder="Introduce tu contraseña"

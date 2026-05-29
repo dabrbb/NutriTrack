@@ -10,9 +10,12 @@ export default function Register() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [password_confirmation, setPassword_confirmation] = useState("");
+    const [errors, setErrors] = useState({});
     const navigate = useNavigate();
 
     const handleRegister = async () => {
+        setErrors({});
+
         try {
             const response = await api.post('/register', {
                 name,
@@ -27,8 +30,11 @@ export default function Register() {
             }
 
         } catch (error) {
-            console.error("Error al registrar: ", error.response?.data);
-            alert("Error: " + (error.response?.data?.message || "No se ha podido registrarse"));
+            if (error.response?.status === 422) {
+                setErrors(error.response.data);
+            } else {
+                setErrors({ general: error.response?.data?.message || "Error en el registro" });
+            }
         }
     }
     return (
@@ -37,12 +43,19 @@ export default function Register() {
             subtitle="Crea tu cuenta NutriTrack."
         >
             <div className="space-y-4">
+                {errors.general && (
+                    <div className="p-3 text-sm text-red-600 bg-red-50 border border-red-200 rounded-lg">
+                        {errors.general}
+                    </div>
+                )}
+
                 <Input
                     label="Nombre"
                     type="text"
                     placeholder="Introduce tu nombre"
                     value={name}
                     onChange={(e) => setName(e.target.value)}
+                    error={errors.name ? errors.name[0] : null}
                 />
                 <Input
                     label="Email"
@@ -50,6 +63,7 @@ export default function Register() {
                     placeholder="Introduce tu email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
+                    error={errors.email ? errors.email[0] : null}
                 />
                 <Input
                     label="Contraseña"
@@ -57,6 +71,7 @@ export default function Register() {
                     placeholder="Crear una contraseña"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
+                    error={errors.password ? errors.password[0] : null}
                 />
                 <Input
                     label="Confirmar Contraseña"
@@ -64,6 +79,7 @@ export default function Register() {
                     placeholder="Confirma tu contraseña"
                     value={password_confirmation}
                     onChange={(e) => setPassword_confirmation(e.target.value)}
+                    error={errors.password_confirmation ? errors.password_confirmation[0] : null}
                 />
             </div>
 
