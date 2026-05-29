@@ -21,14 +21,6 @@ export default function Layout({ children }) {
         }
     };
 
-    const getAvatarUrl = () => {
-        if (!user?.avatar_path) return null;
-        if (user.avatar_path.startsWith('http')) return user.avatar_path;
-
-        const rootUrl = api.defaults.baseURL.replace('/api', '');
-        return `${rootUrl}/storage/${user.avatar_path}`;
-    };
-
     return (
         <div className="min-h-screen bg-[#F8F9FA] font-sans">
             <header className="bg-white border-b border-gray-100 h-16 flex items-center shadow-sm shadow-gray-500/5">
@@ -61,9 +53,9 @@ export default function Layout({ children }) {
                             className="w-9 h-9 rounded-full bg-gray-50 flex items-center justify-center text-gray-400 border border-gray-100 shadow-sm cursor-pointer hover:bg-gray-100/70 transition-colors"
                             onClick={() => navigate('/profile')}
                         >
-                            {user?.avatar_path ? (
+                            {user?.avatar_url ? (
                                 <img
-                                    src={getAvatarUrl()}
+                                    src={user.avatar_url}
                                     alt="Avatar"
                                     className="w-full h-full object-cover rounded-full"
                                 />

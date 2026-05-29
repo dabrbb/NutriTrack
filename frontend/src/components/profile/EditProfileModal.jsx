@@ -37,15 +37,19 @@ export default function EditProfileModal({ isOpen, onClose, user, onSave, onUpda
 
         setSubmittingProfile(true);
         try {
-            await onSave({
+            const payload = {
                 name,
                 birthday: birthday || null,
                 height: height ? parseInt(height) : null,
                 weight: weight ? parseFloat(weight) : null
-            });
+            };
+
+            const res = await onSave(payload);
             onClose();
+            
         } catch (error) {
-            alert(error, "Error al actualizar el perfil");
+            console.error(error);
+            alert("Error al actualizar el perfil");
         } finally {
             setSubmittingProfile(false);
         }

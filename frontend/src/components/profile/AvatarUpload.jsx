@@ -23,19 +23,13 @@ export default function AvatarUpload({ currentAvatarUrl, onAvatarUpdated }) {
 
         setUploading(true);
         try {
-            const response = await api.post('/profile/avatar', formData, {
-                headers: {
-                    'Content-Type': 'multipart/form-data',
-                },
-            });
-            onAvatarUpdated(response.data.avatar_path);
-        } catch (error) {
-            console.error('Error al subir el avatar:', error);
-            if (error.response?.data?.errors) {
-                alert(error.response.data.errors.join('\n'));
-            } else {
-                alert('Error al subir la foto de perfil.');
+            const response = await api.post('/profile/avatar', formData);
+
+            if (onAvatarUpdated) {
+                onAvatarUpdated(response.data.data);
             }
+        } catch (error) {
+            console.error("Error:", error);
         } finally {
             setUploading(false);
         }

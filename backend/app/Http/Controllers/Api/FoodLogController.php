@@ -116,4 +116,95 @@ class FoodLogController extends Controller
 
         return response()->json($formattedHistory);
     }
+
+    public function historyWithMeals(Request $request)
+    {
+        try {
+            $userId = $request->user()->id;
+
+            // Получаем все логи с продуктами за последние 30 дней
+            $logs = DB::table('food_logs')
+                ->join('products', 'food_logs.product_id', '=', 'products.id')
+                ->select(
+                    'food_logs.*',
+                    'products.name as product_name',
+                    'products.kcal',
+                    'products.protein',
+                    'products.fat',
+                    'products.carbs'
+                )
+                ->where('food_logs.user_id', $userId)
+                ->orderBy('food_logs.created_at', 'desc')
+                ->take(100)
+                ->get();
+
+            // Группируем по датам и приемам пищи
+            $history = [];
+
+            foreach ($logs as $log) {
+                $date = Carbon::parse($log->consumed_at ?? $log->created_at)->format('Y-m-d');
+                $mealType = $log->meal_type ?? 'snack'; // если meal_type нет, ставим snack
+
+                // Рассчитываем КБЖУ для этого продукта
+                $ratio = $log->grams / 100;
+                $itemKcal = $log->kcal * $ratio;
+                $itemProtein = $log->protein * $ratio;
+                $itemFat = $log->fat * $ratio;
+                $itemCarbs = $log->carbs * $ratio;
+
+                if (!isset($history[$date])) {
+                    $history[$date] = [
+                        'date' => Carbon::parse($date)->format('d/m/Y'),
+                        'total_kcal' => 0,
+                        'total_protein' => 0,
+                        'total_fat' => 0,
+                        'total_carbs' => 0,
+                        'meals' => []
+                    ];
+                }
+
+                // Добавляем в соответствующий прием пищи
+                if (!isset($history[$date]['meals'][$mealType])) {
+                    $history[$date]['meals'][$mealType] = [];
+                }
+
+                $history[$date]['meals'][$mealType][] = [
+                    'product_name' => $log->product_name,
+                    'grams' => $log->grams,
+                    'kcal' => round($itemKcal),
+                    'protein' => round($itemProtein, 1),
+                    'fat' => round($itemFat, 1),
+                    'carbs' => round($itemCarbs, 1)
+                ];
+
+                // Добавляем в общий итог дня
+                $history[$date]['total_kcal'] += $itemKcal;
+                $history[$date]['total_protein'] += $itemProtein;
+                $history[$date]['total_fat'] += $itemFat;
+                $history[$date]['total_carbs'] += $itemCarbs;
+            }
+
+            // Округляем итоги и преобразуем в массив
+            $result = [];
+            foreach ($history as $date => $day) {
+                $result[] = [
+                    'date' => $day['date'],
+                    'total_kcal' => round($day['total_kcal']),
+                    'total_protein' => round($day['total_protein'], 1),
+                    'total_fat' => round($day['total_fat'], 1),
+                    'total_carbs' => round($day['total_carbs'], 1),
+                    'meals' => $day['meals']
+                ];
+            }
+
+            return response()->json($result);
+        } catch (\Exception $e) {
+            // Возвращаем ошибку для отладки
+            return response()->json([
+                'error' => $e->getMessage(),
+                'line' => $e->getLine(),
+                'file' => $e->getFile()
+            ], 500);
+        }
+    }
 }

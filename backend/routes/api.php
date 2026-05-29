@@ -23,10 +23,13 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::get('/food-logs/totals', [FoodLogController::class, 'getTotals']);
     Route::get('/food-logs/history', [FoodLogController::class, 'history']);
-    Route::apiResource('/food-logs', FoodLogController::class);
+    Route::get('/food-logs', [FoodLogController::class, 'index']);
+    Route::post('/food-logs', [FoodLogController::class, 'store']);
+    Route::delete('/food-logs/{id}', [FoodLogController::class, 'destroy']);
+    Route::get('/food-logs/history-with-meals', [FoodLogController::class, 'historyWithMeals']);
 
     Route::post('/profile/avatar', [ProfileController::class, 'updateAvatar']);
-    
+
     Route::get('/profile', [ProfileController::class, 'show']);
     Route::put('/profile', [ProfileController::class, 'update']);
     Route::put('/profile/password', [ProfileController::class, 'changePassword']);

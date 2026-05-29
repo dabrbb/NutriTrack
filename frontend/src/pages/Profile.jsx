@@ -5,23 +5,22 @@ import Button from '../components/ui/Button';
 import EditProfileModal from '../components/profile/EditProfileModal';
 import HistoryItem from '../components/profile/HistoryItem';
 import ProfileCard from '../components/profile/ProfileCard';
-import { useUser } from '../components/hooks/UserContext';
 import api from '../api';
+import { useUser } from '../components/hooks/UserContext';
 
 export default function Profile() {
     const navigate = useNavigate();
-    const [user, setUser] = useState(null);
+    const {user, setUser} = useUser();
     const [history, setHistory] = useState([]);
     const [loading, setLoading] = useState(true);
     const [isModalOpen, setIsModalOpen] = useState(false);
-    const { refreshUser } = useUser();
 
     const loadProfileData = async () => {
         try {
             const userRes = await api.get('/profile');
-            setUser(userRes.data);
+            setUser(userRes.data.data);
 
-            const historyRes = await api.get('/food-logs/history');
+            const historyRes = await api.get('/food-logs/history-with-meals');
             setHistory(historyRes.data);
         } catch (e) {
             console.error("Error al cargar datos:", e);
@@ -34,22 +33,18 @@ export default function Profile() {
         loadProfileData();
     }, []);
 
-    const handleSaveProfile = async (updatedData) => {
-        const res = await api.put('/profile', updatedData);
-        setUser(res.data.user);
+    const handleSaveProfile = async (data) => {
+        const res = await api.put('/profile', data);
+        setUser(res.data.data);
+        return res;
     };
 
     const handleUpdatePassword = async (passwordData) => {
         await api.put('/profile/password', passwordData);
     };
 
-    const handleAvatarUpdated = async (newAvatarPath) => {
-        setUser(prevUser => ({
-            ...prevUser,
-            avatar_path: newAvatarPath
-        }));
-
-        await refreshUser();
+    const handleAvatarUpdated = async (updatedUser) => {
+        setUser(updatedUser);
     };
 
     const handleLogout = async () => {

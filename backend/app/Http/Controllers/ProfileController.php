@@ -8,12 +8,13 @@ use Illuminate\Validation\Rules\Password;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
+use App\Http\Resources\UserResource;
 
 class ProfileController extends Controller
 {
     public function show(Request $request)
     {
-        return response()->json($request->user());
+        return new UserResource($request->user());
     }
 
     public function update(Request $request)
@@ -34,10 +35,7 @@ class ProfileController extends Controller
             'birthday' => $request->birthday,
         ]);
 
-        return response()->json([
-            'message' => 'Perfil actualizado con éxito',
-            'user' => $user
-        ]);
+        return new UserResource($user);
     }
 
     public function changePassword(Request $request)
@@ -99,11 +97,7 @@ class ProfileController extends Controller
                 'avatar_path' => $path,
             ]);
 
-            return response()->json([
-                'message' => 'Avatar actualizado con éxito',
-                'avatar_path' => $path,
-                'avatar_url' => asset('storage/' . $path),
-            ]);
+            return new UserResource($user);
         } catch (\Exception $e) {
             Log::error('Error uploading avatar: ' . $e->getMessage());
             return response()->json([

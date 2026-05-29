@@ -87,10 +87,10 @@ export default function AddProductModal({ isOpen, onClose, onSave, productToEdit
                         value={name}
                         onChange={(e) => setName(e.target.value)}
                     />
-                    <Input label="Kcal por 100g" type="decimal" min="0" placeholder="0" value={kcal} onChange={(e) => setKcal(e.target.value)} />
-                    <Input label="Proteína por 100g" type="decimal" min="0" placeholder="0" value={protein} onChange={(e) => setProtein(e.target.value)} />
-                    <Input label="Grasa por 100g" type="decimal" min="0" placeholder="0" value={fat} onChange={(e) => setFat(e.target.value)} />
-                    <Input label="Carbohidratos por 100g" type="decimal" min="0" placeholder="0" value={carbs} onChange={(e) => setCarbs(e.target.value)} />
+                    <Input label="Kcal por 100g" type="decimal" min="0" max="2000" placeholder="0" value={kcal} onChange={(e) => setKcal(e.target.value)} />
+                    <Input label="Proteína por 100g" type="decimal" min="0" max="100" placeholder="0" value={protein} onChange={(e) => setProtein(e.target.value)} />
+                    <Input label="Grasa por 100g" type="decimal" min="0" max="100" placeholder="0" value={fat} onChange={(e) => setFat(e.target.value)} />
+                    <Input label="Carbohidratos por 100g" type="decimal" min="0" max="100" placeholder="0" value={carbs} onChange={(e) => setCarbs(e.target.value)} />
 
                     <div className="flex gap-4 pt-4">
                         <Button

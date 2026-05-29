@@ -1,34 +1,23 @@
 import Button from '../ui/Button';
 import AvatarUpload from './AvatarUpload';
-import api from '../../api';
 
 export default function ProfileCard({ user, onEditClick, onLogoutClick, formatDate, onAvatarUpdated }) {
-
-    const getAvatarUrl = () => {
-        if (!user?.avatar_path) return null;
-        if (user.avatar_path.startsWith('http')) return user.avatar_path;
-
-        const baseUrl = api.defaults.baseURL || 'http://127.0.0.1:8000/api';
-        const rootUrl = baseUrl.replace('/api', '');
-
-        return `${rootUrl}/storage/${user.avatar_path}`;
-    };
 
     return (
         <div className="bg-white p-8 mb-10 border border-gray-100 shadow-sm rounded-3xl">
             <div className="flex flex-col md:flex-row items-center md:items-start gap-8">
 
-                {/* Avatar loading and display component */}
+                {/* Componente de carga y visualización de avatar */}
                 <AvatarUpload
-                    currentAvatarUrl={getAvatarUrl()}
+                    currentAvatarUrl={user.avatar_url}
                     onAvatarUpdated={onAvatarUpdated}
                 />
 
-                {/* The main block with user information */}
+                {/* El bloque principal con información del usuario */}
                 <div className="flex-1 w-full text-center md:text-left">
                     <h2 className="text-2xl font-bold text-[#1A1C1E] mb-5">{user?.name}</h2>
 
-                    {/* Parameter grid */}
+                    {/* Cuadrícula de parámetros */}
                     <div className="grid grid-cols-3 gap-4 mb-6 max-w-md mx-auto md:mx-0">
                         <div>
                             <div className="text-[13px] font-bold text-gray-400 mb-1">Fecha de Nacimiento</div>
@@ -44,7 +33,7 @@ export default function ProfileCard({ user, onEditClick, onLogoutClick, formatDa
                         </div>
                     </div>
 
-                    {/* Account management */}
+                    {/* Gestión de cuentas */}
                     <div className="flex flex-col sm:flex-row items-center gap-3">
                         <Button
                             className="w-full sm:w-auto py-2.5 px-5 mt-0 flex items-center justify-center gap-2 text-sm font-semibold rounded-xl shadow-none"

@@ -11,13 +11,13 @@ class ProductController extends Controller
     //
     public function store(Request $request)
     {
-        // Validation
+        // Validacion
         $request->validate([
-            'name' => 'required|string',
-            'kcal' => 'required|numeric|min:0',
-            'protein' => 'required|numeric|min:0',
-            'fat' => 'required|numeric|min:0',
-            'carbs' => 'required|numeric|min:0',
+            'name' => 'required|string|max:255',
+            'kcal' => 'required|numeric|min:0|max:2000',
+            'protein' => 'required|numeric|min:0|max:100',
+            'fat' => 'required|numeric|min:0|max:100',
+            'carbs' => 'required|numeric|min:0|max:100',
         ]);
 
         // Create product in db

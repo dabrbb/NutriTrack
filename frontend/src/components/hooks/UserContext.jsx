@@ -8,7 +8,7 @@ export const UserProvider = ({ children }) => {
 
     const refreshUser = async () => {
         const res = await api.get('/profile');
-        setUser(res.data);
+        setUser(res.data.data);
     };
 
     useEffect(() => {
