@@ -13,6 +13,7 @@ import api from '../api';
 export default function Dashboard() {
     const [products, setProducts] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [errors, setErrors] = useState({});
 
     const [selectedProduct, setSelectedProduct] = useState("");
     const [grams, setGrams] = useState("");
@@ -51,13 +52,18 @@ export default function Dashboard() {
         loadInitialData();
     }, []);
 
-    if (parseFloat(grams) < 0) {
-        alert("Los valores nutricionales no pueden ser negativos.");
-        return;
-    }
-
     const handleCalculate = async () => {
-        if (!selectedProduct || !grams) return;
+        setErrors({});
+
+        if (parseFloat(grams) < 0) {
+            setErrors({ grams: ["Los gramos no pueden ser negativos"] });
+            return;
+        }
+
+        if (!selectedProduct || !grams) {
+            setErrors({ general: "Completa todos los campos" });
+            return;
+        }
 
         try {
             await api.post('/food-logs', {
@@ -81,7 +87,13 @@ export default function Dashboard() {
 
             setGrams("");
         } catch (error) {
-            console.error("Error saving log:", error);
+            if (error.response?.data?.errors) {
+                setErrors(error.response.data.errors);
+            } else if (error.response?.data?.message) {
+                setErrors({ general: [error.response.data.message] });
+            } else {
+                setErrors({ general: ["Error al guardar el registro"] });
+            }
         }
     };
 
@@ -100,19 +112,23 @@ export default function Dashboard() {
 
     return (
         <Layout>
-            {/* 1. Main container */}
+            {/* 1. Contenedor principal */}
             <div className="max-w-3xl mx-auto pt-4">
 
-                {/* 2. Title */}
+                {/* 2. Titulo */}
                 <h1 className="text-[32px] font-bold text-[#1A1C1E] mb-10">
                     Calculadora
                 </h1>
 
-                {/* 3. Main form */}
+                {/* Error común. Por ejemplo, si el servidor no está disponible */}
+                {errors.general && <div className="mb-4 text-red-600 bg-red-50 p-3 rounded-lg">{errors.general}</div>}
+
+                {/* 3. Forma principal */}
                 <Card className="bg-white mb-10">
                     <div className="space-y-6">
                         <Select
                             label="Producto"
+                            error={Array.isArray(errors.product_id) ? errors.product_id[0] : errors.product_id}
                             placeholder={loading ? "Cargando..." : "Introduce un producto"}
                             options={products.map(p => ({ label: p.name, value: p.id }))}
                             value={selectedProduct}
@@ -120,6 +136,7 @@ export default function Dashboard() {
                         />
                         <Input
                             label="Gramos (g)"
+                            error={Array.isArray(errors.grams) ? errors.grams[0] : errors.grams}
                             type="number"
                             min="0"
                             placeholder="Introduzca la cantidad en gramos"
@@ -147,13 +164,13 @@ export default function Dashboard() {
                     </div>
                 </Card>
 
-                {/* Results */}
+                {/* Resultados */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
 
-                    {/* Whitre card */}
+                    {/* Card blanco */}
                     <MealResultCard result={result} />
 
-                    {/* Green card (Total Diario) */}
+                    {/* Card verde (Total Diario) */}
                     <DailyTotalCard total={total} />
                 </div>
                 <TodayMeals logs={logs} onDelete={handleDelete} />

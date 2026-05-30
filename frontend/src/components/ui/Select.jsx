@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 
-export default function Select({ label, options = [], value, onChange, placeholder }) {
+export default function Select({ label, options = [], value, onChange, placeholder, error }) {
     const [isOpen, setIsOpen] = useState(false);
     const selectRef = useRef(null);
 
@@ -32,10 +32,19 @@ export default function Select({ label, options = [], value, onChange, placehold
             <div className="relative">
                 <div
                     onClick={() => setIsOpen(!isOpen)}
-                    className={`w-full rounded-2xl border border-gray-200 bg-white p-4 pr-12 text-gray-700 cursor-pointer transition-all select-none
-                        ${isOpen ? 'ring-2 ring-[#00C950]/20 border-[#00C950]' : 'hover:border-gray-300'}`}
+                    className={`w-full rounded-2xl border p-4 pr-12 text-gray-700 cursor-pointer transition-all select-none
+                        ${error
+                            ? "border-red-500 bg-red-50 focus:ring-red-500/20"
+                            : isOpen
+                                ? 'ring-2 ring-[#00C950]/20 border-[#00C950]'
+                                : 'border-gray-200 bg-white hover:border-gray-300'
+                        }`}
                 >
-                    {selectedOption ? selectedOption.label : <span className="text-gray-300">{placeholder}</span>}
+                    {selectedOption ? (
+                        selectedOption.label
+                    ) : (
+                        <span className="text-gray-300">{placeholder}</span>
+                    )}
                 </div>
 
                 <div className="absolute inset-y-0 right-4 flex items-center pointer-events-none">
@@ -65,6 +74,11 @@ export default function Select({ label, options = [], value, onChange, placehold
                     </div>
                 )}
             </div>
+            {error && (
+                <span className="text-xs text-red-500 ml-1 font-medium">
+                    {error}
+                </span>
+            )}
         </div>
     );
 }

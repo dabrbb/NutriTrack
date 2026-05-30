@@ -17,9 +17,9 @@ export default function Input({ label, type, placeholder, onChange, value, min, 
                     }`}
             />
             {error && (
-                <span className="text-xs text-red-500 ml-1 font-medium">
+                <div className="block text-xs text-red-500 ml-1 mt-1 font-medium">
                     {error}
-                </span>
+                </div>
             )}
         </div>
     );

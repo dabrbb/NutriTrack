@@ -109,13 +109,15 @@ export default function Profile() {
 
             </div>
 
-            <EditProfileModal
-                isOpen={isModalOpen}
-                onClose={() => setIsModalOpen(false)}
-                user={user}
-                onSave={handleSaveProfile}
-                onUpdatePassword={handleUpdatePassword}
-            />
+            {isModalOpen && (
+                <EditProfileModal
+                    isOpen={isModalOpen}
+                    onClose={() => setIsModalOpen(false)}
+                    user={user}
+                    onSave={handleSaveProfile}
+                    onUpdatePassword={handleUpdatePassword}
+                />
+            )}
         </Layout>
     );
 }

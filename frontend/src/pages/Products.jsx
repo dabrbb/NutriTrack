@@ -36,7 +36,6 @@ export default function Products() {
             await loadProducts();
         } catch (e) {
             console.error("Error al guardar producto:", e);
-            alert("No se pudo guardar el producto. Verifica los datos.");
             throw e;
         }
     };
@@ -61,33 +60,38 @@ export default function Products() {
         setIsModalOpen(true);
     };
 
-   return (
+    return (
         <Layout>
             <div className="max-w-5xl mx-auto pt-4 px-4">
                 <h1 className="text-[32px] font-bold text-[#1A1C1E] mb-6">
                     Productos
                 </h1>
 
-                <Button 
+                <Button
                     className="w-fit py-3 px-5 mt-0 mb-8 flex items-center gap-2 rounded-xl shadow-none text-sm font-semibold"
                     onClick={handleAddNewClick}
                 >
                     <span className="text-xl font-light leading-none">+</span> Agregar Producto
                 </Button>
 
-                <ProductTable 
-                    products={products} 
-                    loading={loading} 
-                    onDelete={handleDelete} 
+                <ProductTable
+                    products={products}
+                    loading={loading}
+                    onDelete={handleDelete}
                     onRowClick={handleRowClick}
                 />
 
-                <AddProductModal 
-                    isOpen={isModalOpen}
-                    onClose={() => setIsModalOpen(false)}
-                    onSave={handleSaveProduct}
-                    productToEdit={selectedProduct}
-                />
+                {isModalOpen && (
+                    <AddProductModal
+                        isOpen={isModalOpen}
+                        onClose={() => {
+                            setIsModalOpen(false);
+                            setSelectedProduct(null);
+                        }}
+                        onSave={handleSaveProduct}
+                        productToEdit={selectedProduct}
+                    />
+                )}
             </div>
         </Layout>
     );

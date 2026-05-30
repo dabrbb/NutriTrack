@@ -50,21 +50,15 @@ class ProductController extends Controller
     {
         $product = Product::where('id', $id)->where('user_id', $request->user()->id)->firstOrFail();
 
-        $request->validate([
-            'name' => 'required|string',
-            'kcal' => 'required|numeric|min:0',
-            'protein' => 'required|numeric|min:0',
-            'fat' => 'required|numeric|min:0',
-            'carbs' => 'required|numeric|min:0',
+        $validatedData = $request->validate([
+            'name' => 'required|string|max:255',
+            'kcal' => 'required|numeric|min:0|max:2000',
+            'protein' => 'required|numeric|min:0|max:100',
+            'fat' => 'required|numeric|min:0|max:100',
+            'carbs' => 'required|numeric|min:0|max:100',
         ]);
 
-        $product->update([
-            'name' => $request->name,
-            'kcal' => $request->kcal,
-            'protein' => $request->protein,
-            'fat' => $request->fat,
-            'carbs' => $request->carbs,
-        ]);
+        $product->update($validatedData);
 
         return response()->json($product, 200);
     }
