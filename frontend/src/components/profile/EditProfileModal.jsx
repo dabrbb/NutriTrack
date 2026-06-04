@@ -46,7 +46,7 @@ export default function EditProfileModal({ isOpen, onClose, user, onSave, onUpda
                 weight: weight ? parseFloat(weight) : null
             };
 
-            const res = await onSave(payload);
+            await onSave(payload);
             onClose();
 
         } catch (error) {
@@ -75,7 +75,6 @@ export default function EditProfileModal({ isOpen, onClose, user, onSave, onUpda
             setCurrentPassword("");
             setNewPassword("");
             setNewPasswordConfirmation("");
-            alert("Contraseña actualizada con éxito.");
         } catch (error) {
             if (error.response?.data?.errors) {
                 setPasswordErrors(error.response.data.errors);

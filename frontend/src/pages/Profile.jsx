@@ -6,6 +6,7 @@ import EditProfileModal from '../components/profile/EditProfileModal';
 import HistoryItem from '../components/profile/HistoryItem';
 import ProfileCard from '../components/profile/ProfileCard';
 import api from '../api';
+import { SuccessModal } from '../components/ui/SuccessModal';
 import { useUser } from '../components/hooks/UserContext';
 
 export default function Profile() {
@@ -14,6 +15,7 @@ export default function Profile() {
     const [history, setHistory] = useState([]);
     const [loading, setLoading] = useState(true);
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [showModal, setShowModal] = useState(false);
 
     const loadProfileData = async () => {
         if (!localStorage.getItem('token')) return;
@@ -46,7 +48,13 @@ export default function Profile() {
     };
 
     const handleUpdatePassword = async (passwordData) => {
-        await api.put('/profile/password', passwordData);
+        try {
+            await api.put('/profile/password', passwordData);
+            setShowModal(true);
+            setIsModalOpen(false);
+        } catch (err) {
+            console.error(err);
+        }
     };
 
     const handleAvatarUpdated = async (updatedUser) => {
@@ -118,6 +126,13 @@ export default function Profile() {
                     onUpdatePassword={handleUpdatePassword}
                 />
             )}
+
+            <SuccessModal
+                visible={showModal}
+                title="¡Éxito!"
+                message="Tu contraseña ha sido actualizada correctamente."
+                onClose={() => setShowModal(false)}
+            />
         </Layout>
     );
 }
