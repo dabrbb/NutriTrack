@@ -9,8 +9,10 @@ export default function Products() {
     const [products, setProducts] = useState([]);
     const [loading, setLoading] = useState(true);
     const [isModalOpen, setIsModalOpen] = useState(false);
+    // Estado para almacenar el producto seleccionado al editar
     const [selectedProduct, setSelectedProduct] = useState(null);
 
+    // Cargar la lista actual de productos del servidor
     const loadProducts = async () => {
         try {
             const res = await api.get('/products');
@@ -26,6 +28,7 @@ export default function Products() {
         loadProducts();
     }, []);
 
+    // Controlador genérico: determina el método (POST/PUT) dependiendo de la presencia del ID.
     const handleSaveProduct = async (productData) => {
         try {
             if (productData.id) {
@@ -33,10 +36,11 @@ export default function Products() {
             } else {
                 await api.post('/products', productData);
             }
+            // Actualizar la lista después de una operación exitosa
             await loadProducts();
         } catch (e) {
             console.error("Error al guardar producto:", e);
-            throw e;
+            throw e; // Genera un error para que la ventana modal pueda manejarlo.
         }
     };
 
@@ -50,11 +54,13 @@ export default function Products() {
         }
     };
 
+    // Preparando los datos para abrir una ventana modal en modo de edición
     const handleRowClick = (product) => {
         setSelectedProduct(product);
         setIsModalOpen(true);
     };
 
+    // Borra el producto seleccionado antes de abrir la ventana modal para crear uno nuevo.
     const handleAddNewClick = () => {
         setSelectedProduct(null);
         setIsModalOpen(true);
@@ -81,15 +87,16 @@ export default function Products() {
                     onRowClick={handleRowClick}
                 />
 
+                {/* Renderizado condicional de la ventana modal */}
                 {isModalOpen && (
                     <AddProductModal
                         isOpen={isModalOpen}
                         onClose={() => {
                             setIsModalOpen(false);
-                            setSelectedProduct(null);
+                            setSelectedProduct(null); // Restablecer el estado al cerrar
                         }}
                         onSave={handleSaveProduct}
-                        productToEdit={selectedProduct}
+                        productToEdit={selectedProduct} // Si es null, el modal funciona en modo de creación.
                     />
                 )}
             </div>

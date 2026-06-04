@@ -12,15 +12,20 @@ export default function Login() {
     const navigate = useNavigate();
 
     const handleLogin = async () => {
+        // Borrar los errores anteriores antes de enviar request
         setError(null);
 
         try {
+            // Enviar credenciales al backend de Laravel
             const response = await api.post('/login', { email, password });
+
+            // Si se recibe el token, lo guardamos y lo redirigimos a la cuenta personal.
             if (response.data.token) {
                 localStorage.setItem('token', response.data.token);
                 navigate('/dashboard');
             }
         } catch (error) {
+            // Imprime el mensaje de error devuelto por el servidor o un texto estándar.
             const message = error.response?.data?.message || "Credenciales no válidas";
             setError(message);
         }
@@ -32,6 +37,7 @@ export default function Login() {
             subtitle="¡Bienvenido de nuevo!"
         >
             <div className="space-y-5">
+                {/* Renderizado condicional: el error se muestra solo si hay un mensaje */}
                 {error && (
                     <div className="p-3 text-sm text-red-600 bg-red-50 border border-red-200 rounded-lg">
                         {error}

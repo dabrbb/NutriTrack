@@ -24,6 +24,7 @@ export default function Dashboard() {
     const [mealType, setMealType] = useState("desayuno");
     const [logs, setLogs] = useState([]);
 
+    // Obtén una lista de todas las entradas del día.
     const loadTodayLogs = async () => {
         try {
             const res = await api.get('/food-logs');
@@ -33,6 +34,7 @@ export default function Dashboard() {
         }
     };
 
+    // Carga inicial del directorio de productos y totales actuales
     useEffect(() => {
         const loadInitialData = async () => {
             try {
@@ -52,9 +54,11 @@ export default function Dashboard() {
         loadInitialData();
     }, []);
 
+    // Procesamiento de la adición de un producto: envío al backend y actualización del estado local
     const handleCalculate = async () => {
         setErrors({});
 
+        // Validación del cliente antes de enviar
         if (parseFloat(grams) < 0) {
             setErrors({ grams: ["Los gramos no pueden ser negativos"] });
             return;
@@ -66,16 +70,19 @@ export default function Dashboard() {
         }
 
         try {
+            // Guarda el log en el servidor
             await api.post('/food-logs', {
                 product_id: selectedProduct,
                 grams: grams,
                 meal_type: mealType
             });
 
+            // Actualizar los indicadores generales y la lista diaria
             const totalsRes = await api.get('/food-logs/totals');
             setTotal(totalsRes.data);
             await loadTodayLogs();
 
+            // Cálculo de los macros para el producto agregado actualmente (mostrado en MealResultCard)
             const productData = products.find(p => p.id === parseInt(selectedProduct));
             const ratio = parseFloat(grams) / 100;
             setResult({
@@ -87,6 +94,7 @@ export default function Dashboard() {
 
             setGrams("");
         } catch (error) {
+            // Analizando errores de validación de Laravel (estado 422)
             if (error.response?.data?.errors) {
                 setErrors(error.response.data.errors);
             } else if (error.response?.data?.message) {
@@ -97,6 +105,7 @@ export default function Dashboard() {
         }
     };
 
+    // Eliminar el registro y sincronizar los datos actuales con el servidor.
     const handleDelete = async (id) => {
         try {
             await api.delete(`/food-logs/${id}`);

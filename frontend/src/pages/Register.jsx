@@ -14,6 +14,7 @@ export default function Register() {
     const navigate = useNavigate();
 
     const handleRegister = async () => {
+        // Borrar los errores anteriores antes de intentar enviar de nuevo
         setErrors({});
 
         try {
@@ -24,15 +25,18 @@ export default function Register() {
                 password_confirmation
             });
 
+            // Guardamos el token recibido y redirigimos al usuario
             if (response.data.token) {
                 localStorage.setItem('token', response.data.token);
                 navigate('/dashboard');
             }
 
         } catch (error) {
+            // Manejo de errores de validación de Laravel (estado 422)
             if (error.response?.status === 422) {
                 setErrors(error.response.data);
             } else {
+                // Manejo de otros errores (errores del servidor o problemas de red)
                 setErrors({ general: error.response?.data?.message || "Error en el registro" });
             }
         }
@@ -43,12 +47,17 @@ export default function Register() {
             subtitle="Crea tu cuenta NutriTrack."
         >
             <div className="space-y-4">
+                {/* Muestra un error general si lo hay */}
                 {errors.general && (
                     <div className="p-3 text-sm text-red-600 bg-red-50 border border-red-200 rounded-lg">
                         {errors.general}
                     </div>
                 )}
 
+                {/* Pasa los errores de validación a cada campo Input.
+                    Laravel devuelve los errores como un array para cada campo,
+                    así que tomamos el elemento [0].
+                */}
                 <Input
                     label="Nombre"
                     type="text"
