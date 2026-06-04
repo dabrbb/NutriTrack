@@ -12,11 +12,17 @@ use App\Http\Resources\UserResource;
 
 class ProfileController extends Controller
 {
+    /**
+     * Muestra el perfil del usuario utilizando un Resource para filtrar campos.
+     */
     public function show(Request $request)
     {
         return new UserResource($request->user());
     }
 
+    /**
+     * Actualiza la información básica del perfil.
+     */
     public function update(Request $request)
     {
         $user = $request->user();
@@ -38,15 +44,20 @@ class ProfileController extends Controller
         return new UserResource($user);
     }
 
+    /**
+     * Cambia la contraseña del usuario tras verificar la actual.
+     */
     public function changePassword(Request $request)
     {
         $user = $request->user();
 
         $request->validate([
             'current_password' => 'required|string',
+            // Usa 'confirmed' para validar contra 'new_password_confirmation'
             'new_password' => ['required', 'string', 'confirmed', Password::defaults()],
         ]);
 
+        // Verifica que la contraseña actual sea correcta antes de permitir el cambio
         if (!Hash::check($request->current_password, $user->password)) {
             return response()->json([
                 'message' => 'La contraseña actual no coincide.'
@@ -62,14 +73,17 @@ class ProfileController extends Controller
         ]);
     }
 
+    /**
+     * Maneja la subida y sustitución de la foto de perfil (avatar).
+     */
     public function updateAvatar(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'avatar' => 'required|file|image|max:10240',
+            'avatar' => 'required|file|image|max:10240', // Máximo 10MB
         ]);
 
         if ($validator->fails()) {
-            // Write the error to the laravel.log for debugging purposes
+            // Registra errores de validación en los logs para auditoría
             Log::warning('Validation failed for avatar upload:', $validator->errors()->toArray());
 
             return response()->json([
@@ -81,16 +95,16 @@ class ProfileController extends Controller
         try {
             $user = $request->user();
 
-            // Checking if the file has actually been downloaded
             if (!$request->hasFile('avatar')) {
                 return response()->json(['message' => 'No se ha subido ningún archivo.'], 400);
             }
 
-            // Delete the old file from the disk
+            // Elimina la imagen anterior del almacenamiento antes de guardar la nueva
             if ($user->avatar_path) {
                 Storage::disk('public')->delete($user->avatar_path);
             }
 
+            // Almacena el nuevo archivo en la carpeta 'avatars' dentro del disco público
             $path = $request->file('avatar')->store('avatars', 'public');
 
             $user->update([

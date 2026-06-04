@@ -13,16 +13,21 @@ use function Symfony\Component\Clock\now;
 
 class FoodLogController extends Controller
 {
-    //
+    /**
+     * Obtiene los registros de comida del usuario autenticado para el día actual.
+     */
 
     public function index(Request $request)
     {
         return $request->user()->foodLogs()
             ->whereDate('consumed_at', now()->format('Y-m-d'))
-            ->with('product')
+            ->with('product') // Carga la relación con el producto para obtener sus datos nutricionales
             ->get();
     }
 
+    /**
+     * Almacena un nuevo registro de comida tras validar los datos.
+     */
     public function store(Request $request)
     {
 
@@ -40,6 +45,7 @@ class FoodLogController extends Controller
         $fat = ($product->fat / 100) * $grams;
         $carbs = ($product->carbs / 100) * $grams;
 
+        // Crea el registro en la base de datos
         return FoodLog::create([
             'user_id' => $request->user()->id,
             'product_id' => $product->id,
@@ -49,6 +55,9 @@ class FoodLogController extends Controller
         ]);
     }
 
+    /**
+     * Calcula los totales nutricionales acumulados del día actual.
+     */
     public function getTotals(Request $request)
     {
         $logs = $request->user()->foodLogs()
@@ -61,6 +70,7 @@ class FoodLogController extends Controller
         $f = 0;
         $c = 0;
 
+        // Realiza el cálculo manual basado en la proporción de gramos por 100g del producto
         foreach ($logs as $log) {
             $ratio = $log->grams / 100;
             $kcal += ($log->product->kcal * $ratio);
@@ -77,6 +87,9 @@ class FoodLogController extends Controller
         ]);
     }
 
+    /**
+     * Elimina un registro específico.
+     */
     public function destroy(Request $request, $id)
     {
         $log = $request->user()->foodLogs()->findOrFail($id);
@@ -85,10 +98,14 @@ class FoodLogController extends Controller
         return response()->json(['message' => 'Log deleted successfully'], 200);
     }
 
+    /**
+     * Obtiene el historial de totales diarios usando consultas SQL agregadas.
+     */
     public function history(Request $request)
     {
         $userId = $request->user()->id;
 
+        // Utiliza DB::raw para sumar los valores nutricionales directamente en la base de datos
         $history = DB::table('food_logs')
             ->join('products', 'food_logs.product_id', '=', 'products.id')
             ->select(
@@ -104,6 +121,7 @@ class FoodLogController extends Controller
             ->take(30)
             ->get();
 
+        // Formatea las fechas para el frontend
         $formattedHistory = $history->map(function ($day) {
             return [
                 'date' => Carbon::parse($day->date)->format('d/m/Y'),
@@ -117,12 +135,15 @@ class FoodLogController extends Controller
         return response()->json($formattedHistory);
     }
 
+    /**
+     * Genera un historial jerárquico detallado agrupando por fecha y tipo de comida.
+     */
     public function historyWithMeals(Request $request)
     {
         try {
             $userId = $request->user()->id;
 
-            // Получаем все логи с продуктами за последние 30 дней
+            // Obtiene los últimos 100 registros para el historial
             $logs = DB::table('food_logs')
                 ->join('products', 'food_logs.product_id', '=', 'products.id')
                 ->select(
@@ -138,14 +159,14 @@ class FoodLogController extends Controller
                 ->take(100)
                 ->get();
 
-            // Группируем по датам и приемам пищи
             $history = [];
 
+            // Lógica de agrupación en memoria para estructurar el JSON
             foreach ($logs as $log) {
                 $date = Carbon::parse($log->consumed_at ?? $log->created_at)->format('Y-m-d');
                 $mealType = $log->meal_type ?? 'snack'; // если meal_type нет, ставим snack
 
-                // Рассчитываем КБЖУ для этого продукта
+                // Cálculo individual por producto
                 $ratio = $log->grams / 100;
                 $itemKcal = $log->kcal * $ratio;
                 $itemProtein = $log->protein * $ratio;
@@ -153,6 +174,7 @@ class FoodLogController extends Controller
                 $itemCarbs = $log->carbs * $ratio;
 
                 if (!isset($history[$date])) {
+                    // Estructura los datos bajo cada tipo de comida
                     $history[$date] = [
                         'date' => Carbon::parse($date)->format('d/m/Y'),
                         'total_kcal' => 0,
