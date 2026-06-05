@@ -59,6 +59,7 @@ export default function Profile() {
             setIsModalOpen(false);
         } catch (err) {
             console.error(err);
+            throw err;
         }
     };
 
